@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>SPAM 2000 : Front Page</title>
+  <script type="text/javascript" src="jquery.min.js"></script>
+  <style>
+    html {
+          font-family: Helvetica;
+          display: inline-block;
+          text-align: center;
+         }
+
+    h1 {
+        color: #0F3376;
+        padding: 2vh;
+       }
+
+    p  {
+        font-size: 1.5rem;
+       }
+
+    .button {
+             display: inline-block;
+             background-color: #008CBA;
+             border: none;
+             border-radius: 4px;
+             color: white;
+             padding: 16px 40px;
+             text-decoration: none;
+             font-size: 30px;
+             margin: 2px;
+             cursor: pointer;
+            }
+
+    .button2 {
+              background-color: #f44336;
+             }
+
+    .subcontainer1 {
+		            float: left;
+		            margin: 2px;
+		            width: 200px;
+		            height: 400px;
+		            padding-top: 5px;
+		            border: 1px solid black;
+		            border-radius: 5px;
+		            background-color: coral;
+		           }
+
+    .instr1 {
+		     display: inline-block;
+		     font-size: 10pt;
+	         font-weight: bold;
+		     text-align: left;
+		     padding: 0px 6px 6px 6px;
+		     border-radius: 5px;
+		     background-color: #ecec56
+	        }
+
+    .disp1 {
+		    float: left;
+	        width: 60px;
+	        height: 30px;
+	        padding: 3px;
+	        text-align: right;
+	        border: 1px solid black;
+	        line-height: 30px;
+	        font-size: 25px;
+	        font-weight: bold;
+	        background-color: #edeae1;
+	       }
+
+	 .labl1 {
+		    float: left;
+	        height:30px;
+	        padding: 3px;
+	        text-align: center;
+	        line-height: 30px;
+	        font-size: 25px;
+	        font-weight: bold;
+		    }
+  </style>
+  <script type="text/javascript">
+ /*  $(document).ready(
+                     function()
+                       {
+                        refreshTable();
+                       }
+                    );
+
+   function refreshTable()
+     {
+      $('#voltage').load('/volts', function()
+                                      {
+									   setTimeout(refreshTable, 200);
+									  }
+                        );
+     }
+ */
+
+$(document).ready(function() //Αν φορτώσει η σελίδα
+  {
+   var auto_refresh = setInterval(
+          function ()
+            {
+             $('#voltage').load('/volts #vol'); //Το στοιχείο με Id voltage
+             $('#amperage').load('/volts #amp'); //Το στοιχείο με Id voltage
+             $('#psutemp').load('/volts #psutemp'); //Το στοιχείο με Id voltage
+             //$('#voltage').text("aaaa");
+            }, 250); // refresh every 200 milliseconds
+  });
+
+/*var auto_refresh = setInterval(
+      function ()
+        {
+         xmlhttp=new XMLHttpRequest();
+         xmlhttp.onreadystatechange=function()
+           {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+               {
+                document.getElementById("voltage").innerHTML=xmlhttp.responseText;
+               }
+           }
+         xmlhttp.open("GET", "/volts", true);
+         xmlhttp.send();
+        }, 200); */
+  </script>
+ </head>
+ <body>
+  <H1>AM Control</H1>
+  <div style="display: inline-block;width: 600px; height: 400px;}">
+    <div class="subcontainer1">
+	  Τροφοδοτικό<hr>
+	  <div class="instr1">
+        Tάση:<br>
+	    <div style="display: inline-block; margin: 2px;">
+		  <div id="voltage" class="disp1">124</div>
+		  <div class="labl1">V</div>
+	    </div>
+	  </div>
+	  <br><br>
+	  <div class="instr1" style="background-color: #c8f7da">
+        Ένταση:<br>
+	    <div style="display: inline-block; margin: 2px;">
+		  <div id="amperage" class="disp1">35</div>
+		  <div class="labl1">Α</div>
+	    </div>
+	  </div>
+	  <hr>
+	  <div class="instr1" style="background-color: #9ad7ed">
+        Ποσοστό<br>διαμόρφωσης:<br>
+	    <div style="display: inline-block; margin: 2px;">
+		  <div id="modulation" class="disp1">120</div>
+		  <div class="labl1">%</div>
+	    </div>
+	  </div>
+	  <hr>
+	  <div class="instr1" style="background-color: #99f578">
+        Θερμοκρασία:<br>
+	    <div style="display: inline-block; margin: 2px;">
+		  <div id="psutemp" class="disp1">120</div>
+		  <div class="labl1">°</div>
+	    </div>
+	  </div>
+	</div>
+	<div class="subcontainer1" style="background-color: #c8f7da">
+	  Πομπός<hr>
+	</div>
+
+    <p><a href="/"><button class="button">ON</button></a></p>
+    <p><a href="/"><button class="button button2">OFF</button></a></p>
+
+ </body>
+</html>
