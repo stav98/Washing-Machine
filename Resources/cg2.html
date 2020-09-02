@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>Character Generator</title>
+  <style>
+	table {
+           border-collapse: collapse;
+       }
+	table, th, td {
+                   border: 1px solid black;
+       }
+    td:hover {
+       background-color: yellow;
+       }
+  </style>
+  <script>
+   var w, h;
+   function grid()
+	{
+	var i, j, s;
+	cont = document.getElementById("container");
+	w = document.getElementById("width").value;
+	h = document.getElementById("height").value;
+    s='<table>';
+	for (i = 0; i < h; ++i)
+	  {
+	   s+='<tr height="20">';
+	   for(j = 0; j < w; ++j)
+	       s+='<td id="' + i + '-' + j + '" width="15" onclick="tdclick(this.id)"><input type="hidden" value="0"></td>';
+	   s+='</tr>';
+      }
+    s+='</table>';
+    cont.innerHTML=s;
+     }
+
+   function tdclick(id)
+     {
+	  var cell = document.getElementById(id);
+	  var pix = cell.getElementsByTagName("input")[0];
+	  if (pix.value == 0)
+	     {
+	      cell.style.background = "red";
+	      pix.value = 1
+	     }
+	  else
+	     {
+		  cell.style.background = "white";
+	      pix.value = 0;
+		 }
+     }
+
+   function disp()
+     {
+	  var cell, pix, id, nums, i, j, t, k, l;
+	  var val = document.getElementById("inp1").value;
+	  var nums = val.split(',');
+	  var r = h / 8;
+	  if (h > 8)
+	      l = 8;
+	  else
+	      l = h;
+	  for(k=0; k < r; ++k)
+	     {
+	      for(i=0; i<w; ++i)
+	         {
+		      var p = 1;
+		      for(j=0; j<l; ++j)
+		         {
+			      t = parseInt(nums[i+w*k]);
+			      id = (j+k*8)+'-'+i;
+	              cell = document.getElementById(id);
+	              pix = cell.getElementsByTagName("input")[0];
+			      if (t & p)
+			         {
+	                  cell.style.background = "red";
+	                  pix.value = 1;
+	                 }
+	              else
+	                 {
+			          cell.style.background = "white";
+	                  pix.value = 0;
+			         }
+	              p *= 2;
+	             }
+             }
+         }
+     }
+
+   function calc()
+     {
+	  var cell, pix, id, i, j, k, t, s = "";
+	  var out = document.getElementById("out");
+	  out.value="";
+	  var r = h / 8;
+	  for(k=0; k<r; ++k)
+	     {
+	      for(i=0; i<w; ++i)
+	         {
+		      t = 0;
+		      var p = 1;
+		      for(j=0; j<8; ++j) //h
+		         {
+			      id = (j+k*8)+'-'+i;
+	              cell = document.getElementById(id);
+	              pix = cell.getElementsByTagName("input")[0];
+			      if (pix.value == '1')
+			         {
+	                  t += p;
+	                 }
+	              p *= 2;
+	             }
+	          t = t.toString(16);
+	          t = '0x' + t.padStart(2, '0').toUpperCase();
+	          s += t + ', ';
+             }
+         }
+      out.value = s.substring(0, s.length - 2);
+     }
+
+   function grcode()
+      {
+       var i, t, dist, outstr = "";
+       var inp = document.getElementById("msg").value;
+       var out = document.getElementById("grk_code");
+       var fgchar = document.getElementById("fst_greek_char").value;
+       dist = 913 - fgchar;
+       for(i=0; i < inp.length; ++i)
+	      {
+	       t = inp.charCodeAt(i);
+	       if (t >= 931)
+	           t = t - dist - 1;
+	       else if (t >= 913)
+	           t = t - dist;
+	       t = t.toString(16);
+	       t = '0x' + t.padStart(2, '0').toUpperCase();
+	       outstr += t + ', ';
+	      }
+	   out.value = '{' + outstr + '0};';
+      }
+
+    function copy(obj)
+       {
+	    var o = document.getElementById(obj);
+	    o.select();
+	    o.setSelectionRange(0, 99999);
+	    document.execCommand("copy");
+	   }
+  </script>
+ </head>
+ <body>
+  <H1>Character Generator</H1>
+  Πλάτος :
+  <input type="text" id="width" style="width: 30px;" value="8" onchange="grid()">&nbsp;
+  Ύψος :
+  <input type="text" id="height" style="width: 30px;" value="8" onchange="grid()"><br><br>
+  Bytes χαρακτήρα χωρισμένα με ',' :<br>
+  <input type="text" id="inp1" style="width: 300px;" value="">
+  <button onclick="disp()" title="Εμφάνισε χαρακτήρα">Display</button><br><br>
+  <div id="container"></div>
+  <script>grid();</script>
+  <br>
+  <button onclick="calc()" title="Υπολογισμός Bytes">Calculate</button><br><br>
+  Αποτέλεσμα :<br>
+  <input type="text" id="out" style="width: 300px; background-color: rgb(240, 212, 134)" value="">&nbsp;
+  <button onclick="copy('out')" title="Αντιγραφή στο πρόχειρο">Copy</button>
+  <H2>String Helper</H2>
+  Κείμενο στα ελληνικά:<br>
+  <input type="text" id="msg" style="width: 300px;" value="" autocomplete="off">&nbsp
+  Θέση 1ου ελληνικού χαρακτήρα : <input type="text" id="fst_greek_char" style="width: 30px;" value="128"><br><br>
+  <button onclick="grcode()">Κώδικας ελληνικών</button><br><br>
+  Αποτέλεσμα :<br>
+  <input type="text" id="grk_code" style="width: 300px; background-color: rgb(164, 237, 213)" value="">&nbsp;
+  <button onclick="copy('grk_code')" title="Αντιγραφή στο πρόχειρο">Copy</button>
+ </body>
+</html>
