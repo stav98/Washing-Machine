@@ -1,7 +1,6 @@
 #define BTN_UP    14
 #define BTN_DOWN  0
-#define BTN_OK    33
-#define BTN_PWR   13
+#define BTN_OK    13
 #define PULL_UP     HIGH
 void initBUTTONS(void);
 void Butn_Up_Click(void);
@@ -10,7 +9,7 @@ void Butn_Up_Dbl_Click(void);
 
 void Butn_Down_Click(void);
 
-void Butn_Pwr_Long_Click(void);
+void Butn_Ok_Long_Click(void);
 
 class Buttons
 {
@@ -159,14 +158,13 @@ class Buttons
       } //Τέλος της CheckBP()
 };  //Τέλος ορισμού της κλάσης
 
-Buttons butn_Up, butn_Down, butn_Pwr;
+Buttons butn_Up, butn_Down, butn_Ok;
 
 void initBUTTONS()
 {
- //pinMode(BTN_UP, INPUT_PULLUP);
-  //pinMode(BTN_DOWN, INPUT_PULLUP);
-  //pinMode(BTN_OK, INPUT_PULLUP);
-  //pinMode(BTN_PWR, INPUT_PULLUP);
+ pinMode(BTN_UP, INPUT_PULLUP);
+ pinMode(BTN_DOWN, INPUT_PULLUP);
+ pinMode(BTN_OK, INPUT_PULLUP);
  butn_Up.Configure(BTN_UP);
  butn_Up.OnClick = Butn_Up_Click;
  butn_Up.OnLongPress = Butn_Up_Long_Click;
@@ -175,8 +173,8 @@ void initBUTTONS()
  butn_Down.Configure(BTN_DOWN);
  butn_Down.OnClick = Butn_Down_Click;
 
- butn_Pwr.Configure(BTN_PWR);
- butn_Pwr.OnLongPress = Butn_Pwr_Long_Click;
+ butn_Ok.Configure(BTN_OK);
+ butn_Ok.OnLongPress = Butn_Ok_Long_Click;
 }
 
 //Όταν πατιέται ένα κλικ στο button
@@ -202,10 +200,12 @@ void Butn_Up_Dbl_Click()
 
 void Butn_Down_Click()
 {
+ Serial.println("Button Down Click"); //Debug 
  //playTone(600, 30);
 }
 
-void Butn_Pwr_Long_Click()
+void Butn_Ok_Long_Click()
 {
+ Serial.println("Button OK Long Click"); //Debug 
 // playTone(2500, 300);
 }

@@ -7,11 +7,14 @@
 #include "screen.h"
 #include "motor.h"
 #include "adc.h"
+#include "functions.h"
 #include "network.h"
 //#include "sound.h"
 #include "buttons.h"
 #include "cmd.h"
 #include "commands.h"
+
+unsigned long time_now;
 
 //Λειτουργεί στον πυρήνα 1
 void setup() 
@@ -38,57 +41,67 @@ void setup()
       lcd.begin(DISP_DATA, DISP_CLK);
       initADC();
       //  initSOUND();
-      initBUTTONS();
+      //initBUTTONS();
       initWebServer();
       Serial.println("Starting ...");
       //  sound_demo();
       //front_page_stat();
       //intro();
-     
+
+      pinMode(VALVE1, OUTPUT);
+      pinMode(VALVE2, OUTPUT);
+      pinMode(PUMP, OUTPUT);
+      pinMode(HEATER, OUTPUT);
+      pinMode(DOOR_LOCK, OUTPUT);
+      pinMode(WATER_L1, INPUT_PULLUP);
+      //Ταχογεννήτρια. Αυτό λειτουργεί στον πυρήνα 0
+      //pinMode(TACHO_PIN, INPUT_PULLUP);
+      //attachInterrupt(TACHO_PIN, tacho_ISR, FALLING);
       
       init_motor();
       pinMode(TEST_PIN, OUTPUT);
       
       time_now = millis();
-
-      //add_commands();
-      //cmd_display(); //Εμφάνισε prompt στο τερματικό
-      Serial.println(sizeof(int));
-      Serial.println(sizeof(long int));
-      Serial.println(sizeof(float));
-      Serial.println(sizeof(double));
-      Serial.println(sizeof(short));
+      door_lock();
+      dest_w_temp = 31;
      }
 
 //Τρέχει στον πυρήνα 0
 void Task1code( void * pvParameters )
      {
       //------ Δεύτερο setup γι αυτόν τον πυρήνα ------
+      //Ταχογεννήτρια.
       pinMode(TACHO_PIN, INPUT_PULLUP);
       attachInterrupt(TACHO_PIN, tacho_ISR, FALLING);
+      //Εντολές τερματικού
       add_commands();
       cmd_display(); //Εμφάνισε prompt στο τερματικό
+      //Πλήκτρα
+      initBUTTONS();
       //------ Δεύτερο loop γι αυτόν τον πυρήνα -------
       for(;;)
          {
           //Serial.print("this running on core ");
           //Serial.println(xPortGetCoreID());
+          //Αποκωδικοποίηση εντολών τερματικού.
           cmdPoll();
-          delay(50);
+          //Έλεγχος πλήκτρων.
+          butn_Up.CheckBP(); //Έλεγχος της κλάσης για το πάτημα του button
+          butn_Down.CheckBP();
+          butn_Ok.CheckBP();
+          delay(1);
          } 
      }
 
+//int rr = 1000;
+bool once_flag = false;
 //Λειτουργεί στον πυρήνα 1
 void loop() 
      {
+      //Έλεγχος πλήκτρων. Αυτό λειτουργεί στον πυρήνα 0
       //butn_Up.CheckBP(); //Έλεγχος της κλάσης για το πάτημα του button
       //butn_Down.CheckBP();
-      //butn_Pwr.CheckBP();
-      //if (digitalRead(17) == 0)
-      //readInstruments();
-      //motor_speed = 180; //0 - 430  Το μοτέρ αρχίζει να γυρίζει με 60 και με 390 φτάνει 25000 RPM χωρίς φορτίο
-      //dim = 490 - motor_speed; //Full=60, Start=490
-      //cmdPoll();
+      //butn_Ok.CheckBP();
       if (!once_flag)
          {
           lcd.clear();
@@ -96,26 +109,39 @@ void loop()
           status_bar();
           once_flag = true;
          }
-      if ((millis() - time_now) >= 500)
+      //Κάθε 1 sec
+      if ((millis() - time_now) >= 1000)
          {
           time_now = millis();
-          //lcd.clear();
-          //front_page();
-          //status_bar();
           read_Wtemp();
-          lcd.gotoxy(82, 32);
+          lcd.gotoxy(108, 24);
           lcd.printf("%5d", avg_rpm); 
-          //lcd.print(avg_rpm);
           lcd.gotoxy(38, 56);
           lcd.print(w_temp);
-         //- if (motor_speed >= 190)
-         //-     motor_speed = 20;
+          //if (rr >= 8000)
+          //    rr = 8000;
           //else
-              //motor_speed += 10;
-          //dim = 1000 - motor_speed;
+          //    rr += 100;
+          //target_rpm = rr;
          }
-      motor_control();
-      plisi_turn();
+
+      //=== Εκτέλεση προγράμματος συνέχεια ===
+      //Αν η πόρτα είναι κλειστή τότε
+      if (chk_door())
+         {
+          washing1(scheme1); //Εκτέλεσε πρόγραμμα
+         }
+      //Αλλιώς
+      else
+         {
+          valve(0);  //Σταμάτα εισαγωγή νερού
+          valve_delay = 0;
+          state = 0;
+          r_cnt1 = 0;
+          AUX1 = false;
+         }
+      //======================================
+ 
       //lcd.clear();
       //lcd.selectFont(font_fixed_5x8);
       //lcd.selectFont(font_fixed_3x5);
@@ -158,8 +184,5 @@ void loop()
       //lcd.clear();
       //lcd.img(pic1, 20, 20, 1);
       //delay(2000);
-         
-      
-      //delay(1);
-      
+      delay(1);
      }

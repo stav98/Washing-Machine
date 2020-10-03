@@ -1,7 +1,4 @@
 #define W_TEMP_PIN     36
-//#define ADC_AMPS      39
-//#define ADC_FWD       34
-//#define ADC_REV       35
 
 #define THERMISTORNOMINAL 4829      
 // temp. for nominal resistance (almost always 25 C)
